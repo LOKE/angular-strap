@@ -113,8 +113,11 @@ angular.module('$strap.directives')
               element.val(date);
               return date;
             }
-            if(!controller.$viewValue) element.val('');
-            return element.datepicker('update', controller.$viewValue);
+            if (!controller.$viewValue || Object.keys(controller.$viewValue).length === 0) {
+              element.val('');
+            } else {
+              return element.datepicker('update', controller.$viewValue);
+            }
           };
 
         }
@@ -128,7 +131,7 @@ angular.module('$strap.directives')
             element.on('changeDate', function(ev) {
               var fn = function () {
                   controller.$setViewValue(type === 'string' ? element.val() : ev.date);
-              };
+                };
               (scope.$$phase || scope.$root.$$phase) ? fn() : scope.$apply();
             });
           }

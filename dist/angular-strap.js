@@ -1,6 +1,6 @@
 /**
  * AngularStrap - Twitter Bootstrap directives for AngularJS
- * @version v0.7.8 - 2013-11-15
+ * @version v0.7.8 - 2013-12-05
  * @link http://mgcrea.github.com/angular-strap
  * @author Olivier Louvignes <olivier@mg-crea.com>
  * @license MIT License, http://www.opensource.org/licenses/MIT
@@ -353,9 +353,11 @@
                   element.val(date);
                   return date;
                 }
-                if (!controller.$viewValue)
+                if (!controller.$viewValue || Object.keys(controller.$viewValue).length === 0) {
                   element.val('');
-                return element.datepicker('update', controller.$viewValue);
+                } else {
+                  return element.datepicker('update', controller.$viewValue);
+                }
               };
             }
             if (isAppleTouch) {
@@ -363,9 +365,10 @@
             } else {
               if (controller) {
                 element.on('changeDate', function (ev) {
-                  scope.$apply(function () {
+                  var fn = function () {
                     controller.$setViewValue(type === 'string' ? element.val() : ev.date);
-                  });
+                  };
+                  scope.$$phase || scope.$root.$$phase ? fn() : scope.$apply();
                 });
               }
               element.datepicker(angular.extend(options, {
@@ -389,6 +392,7 @@
             var component = element.siblings('[data-toggle="datepicker"]');
             if (component.length) {
               component.on('click', function () {
+                console.log('click');
                 if (!element.prop('disabled')) {
                   element.trigger('focus');
                 }
@@ -412,6 +416,8 @@
               var mValue = getFormattedModelValue(newDateString, newFormat, newLanguage);
               controller.$modelValue = mValue;
               controller.$viewValue = newDateString;
+              console.log('controller.$modelValue:' + controller.$modelValue);
+              console.log('controller.$viewValue:' + controller.$viewValue);
             }
           });
         }
